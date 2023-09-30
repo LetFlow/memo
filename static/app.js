@@ -1,13 +1,45 @@
-async function readMemo() {
-  const res = await fetch("/memos");
-  const jsonRes = await res.json();
-  // console.log(jsonRes);
+async function editMemo(event) {
+  const id = event.target.dataset.id;
+  const editInput = prompt("수정할 값을 입력하세요!");
+  const res = await fetch(`/memo/${id}`, {
+    method: "PUT", //값 수정 시 PUT method 사용
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id,
+      content: editInput,
+    }),
+  });
+  readMemo();
 }
 
-readMemo();
+function displayMemo(memo) {
+  const ul = document.querySelector("#memo-ul");
+
+  const li = document.createElement("li");
+  li.innerText = `[id:${memo.id}] ${memo.content}`;
+
+  const editBtn = document.createElement("button");
+  editBtn.innerText = "수정하기";
+  editBtn.addEventListener("click", editMemo);
+  editBtn.dataset.id = memo.id;
+
+  ul.appendChild(li);
+  li.appendChild(editBtn);
+}
+
+async function readMemo() {
+  const res = await fetch("/memo");
+  const jsonRes = await res.json();
+  const ul = document.querySelector("#memo-ul");
+  ul.innerHTML = "";
+  // console.log(jsonRes);
+  jsonRes.forEach(displayMemo);
+}
 
 async function createMemo(content) {
-  const res = await fetch("/memos", {
+  const res = await fetch("/memo", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -32,6 +64,8 @@ function handleSubmit(event) {
   console.log(input.value);
   input.value = "";
 }
+
+readMemo();
 
 const form = document.querySelector("#memo-form");
 form.addEventListener("submit", handleSubmit);

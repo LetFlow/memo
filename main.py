@@ -34,4 +34,12 @@ def update_memo(memo:Memo):
             return '성공'
     return '그런 메모는 없음'
 
-app.mount("/memo", StaticFiles(directory='static',html=True),name='static')
+@app.delete("/memo/{id}")
+def delete_memo(id):
+    for index, memo in enumerate(memos):
+        if memo.id ==id:
+            del memos[index]
+            return '성공'
+    return '그런 메모는 없음'
+
+app.mount("/", StaticFiles(directory='static',html=True),name='static')
